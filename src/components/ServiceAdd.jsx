@@ -1,43 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import useServiceActions from '../hooks/useServiceActions';
 import './ServiceAdd.css';
+import { useSelector } from 'react-redux';
 
 export default function ServiceAdd({
   value = { name: '', price: '' },
   isEdit = false,
   onReset,
 }) {
-  const [item, setItem] = useState(value);
+  const { name, price } = useSelector((state) => state.serviceAdd);
   const { add, edit, changeField } = useServiceActions();
 
   useEffect(() => {
-    setItem(value);
+    changeField('name', value.name);
+    changeField('price', value.price);
   }, [value]);
 
   const handleChange = (evt) => {
     const { name, value } = evt.target;
-    setItem((prev) => ({ ...prev, [name]: value }));
     changeField(name, value);
   };
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     if (isEdit) {
-      edit(item.id, item.name, parseInt(item.price));
+      edit(value.id, name, parseInt(price));
       onReset();
       return;
     }
-    add(item.name, parseInt(item.price));
-    setItem({ name: '', price: '' });
+    add(name, parseInt(price));
+    onReset();
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input name='name' onChange={handleChange} value={item.name} required />
+      <input name='name' onChange={handleChange} value={name} required />
       <input
         name='price'
         onChange={handleChange}
-        value={item.price}
+        value={price}
         type='number'
         required
       />
